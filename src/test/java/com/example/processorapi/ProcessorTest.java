@@ -62,4 +62,12 @@ public class ProcessorTest {
         testDriver.advanceWallClockTime(Duration.ofMinutes(1));
         assertThat(store.all().hasNext()).isFalse();
     }
+
+    @Test
+    void clearing_the_state_store_propagates_a_tombstone_message_to_the_output_topic() {
+        inputTopic.pipeInput("key1", "value1");
+        testDriver.advanceWallClockTime(Duration.ofMinutes(10));
+        assertThat(outputTopic.readKeyValue()).isEqualTo(new KeyValue<>("key1", "value1-a"));
+        assertThat(outputTopic.readKeyValue()).isEqualTo(new KeyValue<>("key1", null));
+    }
 }
