@@ -2,6 +2,7 @@ package com.example.processorapi;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,7 @@ public class ProcessorTest {
 
     private TestInputTopic<String, String> inputTopic;
     private TestOutputTopic<String, String> outputTopic;
+    private TopologyTestDriver testDriver;
 
     @BeforeEach
     public void beforeEach() {
@@ -22,13 +24,18 @@ public class ProcessorTest {
         Properties properties = new Properties();
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
         properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
-        TopologyTestDriver testDriver = new TopologyTestDriver(topology, properties);
+        testDriver = new TopologyTestDriver(topology, properties);
 
         Serdes.StringSerde stringSerde = new Serdes.StringSerde();
         inputTopic = testDriver.createInputTopic(
                 "inputTopic", stringSerde.serializer(), stringSerde.serializer());
         outputTopic = testDriver.createOutputTopic(
                 "outputTopic", stringSerde.deserializer(), stringSerde.deserializer());
+    }
+
+    @AfterEach
+    public void afterEach() {
+        testDriver.close();
     }
 
     @Test
