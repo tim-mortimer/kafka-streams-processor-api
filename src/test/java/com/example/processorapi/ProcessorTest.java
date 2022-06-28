@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,5 +51,15 @@ public class ProcessorTest {
         inputTopic.pipeInput("key1", "value1");
         KeyValueStore<String, String> store = testDriver.getKeyValueStore("store");
         assertThat(store.get("key1")).isEqualTo("value1-a");
+    }
+
+    @Test
+    void the_state_store_is_cleared_every_10_minutes() {
+        inputTopic.pipeInput("key1", "value1");
+        KeyValueStore<String, String> store = testDriver.getKeyValueStore("store");
+        testDriver.advanceWallClockTime(Duration.ofMinutes(9));
+        assertThat(store.all().hasNext()).isTrue();
+        testDriver.advanceWallClockTime(Duration.ofMinutes(1));
+        assertThat(store.all().hasNext()).isFalse();
     }
 }
