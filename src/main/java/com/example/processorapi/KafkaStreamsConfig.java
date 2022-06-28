@@ -33,7 +33,11 @@ public class KafkaStreamsConfig {
                 .toStream()
                 .to("outputTopic");
 
-        stream.process(() -> new ClearStoreProcessor<>("store"), "store");
         return stream;
+    }
+
+    @Bean
+    public void kStreamCleanup(KStream<String, String> stream) {
+        stream.process(() -> new ClearStoreProcessor<>("store"), "store");
     }
 }

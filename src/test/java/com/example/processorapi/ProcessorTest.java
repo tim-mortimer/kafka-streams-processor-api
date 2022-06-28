@@ -2,6 +2,7 @@ package com.example.processorapi;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,8 @@ public class ProcessorTest {
     @BeforeEach
     public void beforeEach() {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
-        new KafkaStreamsConfig().kStream(streamsBuilder);
+        KStream stream = new KafkaStreamsConfig().kStream(streamsBuilder);
+        new KafkaStreamsConfig().kStreamCleanup(stream);
         Topology topology = streamsBuilder.build();
         Properties properties = new Properties();
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
