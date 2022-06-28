@@ -2,6 +2,7 @@ package com.example.processorapi;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
+import org.apache.kafka.streams.state.KeyValueStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,5 +43,12 @@ public class ProcessorTest {
     void it_appends_hyphen_a_to_input_values() {
         inputTopic.pipeInput("key1", "value1");
         assertThat(outputTopic.readKeyValue()).isEqualTo(new KeyValue<>("key1", "value1-a"));
+    }
+
+    @Test
+    void it_populates_the_state_store() {
+        inputTopic.pipeInput("key1", "value1");
+        KeyValueStore<String, String> store = testDriver.getKeyValueStore("store");
+        assertThat(store.get("key1")).isEqualTo("value1-a");
     }
 }
